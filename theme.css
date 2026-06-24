@@ -1,0 +1,139 @@
+/**
+ * theme.css — Doces Flor · Shared
+ * Importar via jsDelivr em todos os repositórios:
+ *
+ *   <!-- Fontes + variáveis de tema -->
+ *   <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/docesflor/shared@main/theme.css">
+ *
+ * Este arquivo substitui:
+ *   - O <link> do Google Fonts (Cormorant Garamond + DM Sans)
+ *   - O bloco :root { --brown-dark, --amber, --cream... } de cada HTML
+ *
+ * ATENÇÃO: importe este arquivo ANTES de qualquer <style> do próprio repositório,
+ * para que as variáveis estejam disponíveis quando o CSS local for processado.
+ */
+
+/* ── FONTES ─────────────────────────────────────────── */
+@import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;0,700;1,400;1,600&family=DM+Sans:wght@300;400;500;600&display=swap');
+
+/* ── RESET MÍNIMO ────────────────────────────────────── */
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+/* ── VARIÁVEIS DE TEMA ───────────────────────────────── */
+:root {
+  /* Paleta principal */
+  --brown-dark:    #2B1206;
+  --brown-mid:     #5C2A0E;
+  --brown-warm:    #8B4513;
+  --amber:         #E8943A;
+  --amber-light:   #F5B563;
+  --cream:         #FDF8F0;
+  --cream-dark:    #F0E6D3;
+  --green:         #4A7C59;
+  --red:           #e53935;
+  --blue:          #5b8def;
+  --white:         #FFFFFF;
+
+  /* Texto e sombras */
+  --text-body:     #3D2010;
+  --shadow:        rgba(43, 18, 6, 0.15);
+  --shadow-strong: rgba(43, 18, 6, 0.30);
+
+  /* Aliases usados pelo sistema de pedidos (compatibilidade) */
+  --laranja:        var(--amber);
+  --laranja-escuro: #C9522A;
+  --laranja-claro:  var(--amber-light);
+  --marrom:         var(--brown-dark);
+  --marrom-medio:   var(--brown-warm);
+  --bege:           var(--cream);
+  --bege-escuro:    var(--cream-dark);
+  --verde:          var(--green);
+  --branco:         var(--white);
+
+  /* Aliases curtos usados pelo admin (compatibilidade) */
+  --bd: var(--brown-dark);
+  --bm: var(--brown-mid);
+  --bw: var(--brown-warm);
+  --am: var(--amber);
+  --al: var(--amber-light);
+  --cr: var(--cream);
+  --cd: var(--cream-dark);
+  --gn: var(--green);
+  --rd: var(--red);
+  --wh: var(--white);
+  --sh: rgba(43, 18, 6, 0.13);
+}
+
+/* ── BASE DO CORPO ───────────────────────────────────── */
+body {
+  font-family: 'DM Sans', sans-serif;
+  background-color: var(--cream);
+  color: var(--text-body);
+  overflow-x: hidden;
+}
+
+/* ── UTILITÁRIOS GLOBAIS ─────────────────────────────── */
+
+/* Tela de login (padrão compartilhado entre hub, pedidos e admin) */
+.login-screen {
+  display: flex;
+  position: fixed;
+  inset: 0;
+  z-index: 9999;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  background: var(--brown-dark);
+}
+
+.login-screen::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background:
+    radial-gradient(ellipse 60% 50% at 50% 0%, rgba(232,148,58,0.18) 0%, transparent 70%),
+    repeating-linear-gradient(-45deg, transparent 0px, transparent 18px, rgba(255,255,255,0.02) 18px, rgba(255,255,255,0.02) 19px);
+  pointer-events: none;
+}
+
+/* Logo ring animado (usada no login de todos os sites) */
+.login-logo-ring {
+  width: 96px;
+  height: 96px;
+  border-radius: 50%;
+  border: 3px solid var(--amber);
+  padding: 4px;
+  background: var(--brown-dark);
+  margin: 0 auto 1rem;
+  box-shadow:
+    0 0 0 1px rgba(232,148,58,0.3),
+    0 12px 30px rgba(0,0,0,0.4);
+  animation: floatLogo 4s ease-in-out infinite;
+  overflow: hidden;
+}
+
+.login-logo-ring img {
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  object-fit: cover;
+}
+
+@keyframes floatLogo {
+  0%, 100% { transform: translateY(0); }
+  50%       { transform: translateY(-6px); }
+}
+
+/* Toast de notificação (usado em pedidos e admin) */
+@keyframes toastEntrar {
+  from { opacity: 0; transform: translateX(-50%) translateY(12px); }
+  to   { opacity: 1; transform: translateX(-50%) translateY(0); }
+}
