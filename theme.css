@@ -1,0 +1,80 @@
+/* ═══════════════════════════════════════════
+   DOCES FLOR — THEME COMPARTILHADO
+   Usado por: pedidos (DEV_index_pedidos.html) e cardápio (público)
+   Extraído em 06/07/2026 a partir dos dois arquivos originais.
+═══════════════════════════════════════════ */
+
+/* Fontes — carregar ANTES deste arquivo no <head>:
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;0,700;1,400;1,600&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+*/
+
+/* ── RESET (idêntico nos dois arquivos originais) ── */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html { scroll-behavior: smooth; }
+
+/* ── PALETA DE CORES
+     Usei a versão de pedidos.html como base (é um superset).
+     O cardápio usava só uma parte destas mesmas variáveis, com os
+     mesmos valores — nada muda visualmente pro cardápio. ── */
+:root {
+    --brown-dark:    #2B1206;
+    --brown-mid:     #5C2A0E;
+    --brown-warm:    #8B4513;
+    --amber:         #E8943A;
+    --amber-light:   #F5B563;
+    --cream:         #FDF8F0;
+    --cream-dark:    #F0E6D3;
+    --green:         #4A7C59;
+    --white:         #FFFFFF;
+    --text-body:     #3D2010;
+    --shadow:        rgba(43,18,6,0.15);
+    --shadow-strong: rgba(43,18,6,0.30);
+    --red:           #e53935;
+    --blue:          #5b8def;
+
+    /* aliases em português usados em pedidos.html */
+    --laranja:        var(--amber);
+    --laranja-escuro:  #C9522A;
+    --laranja-claro:   var(--amber-light);
+    --marrom:          var(--brown-dark);
+    --marrom-medio:    var(--brown-warm);
+    --bege:            var(--cream);
+    --bege-escuro:     var(--cream-dark);
+    --verde:           var(--green);
+    --branco:          var(--white);
+}
+
+/* ── BASE DO BODY (idêntico nos dois arquivos originais;
+     cada site pode sobrescrever padding-top/overflow se precisar) ── */
+body {
+    font-family: 'DM Sans', sans-serif;
+    background-color: var(--cream);
+    color: var(--text-body);
+    overflow-x: hidden;
+}
+
+/* ── LOGO ANIMADO (login e topo de pedidos, header do cardápio)
+     ATENÇÃO: no original, pedidos.html flutuava -6px e o cardápio
+     flutuava -8px — não eram idênticos. Unifiquei com uma custom
+     property, com -8px como padrão. Se quiser o valor antigo de
+     pedidos.html, defina --logo-float-distance: 6px onde for usar. ── */
+@keyframes floatLogo {
+    0%, 100% { transform: translateY(0); }
+    50%      { transform: translateY(calc(-1 * var(--logo-float-distance, 8px))); }
+}
+
+.logo-ring-anim {
+    border-radius: 50%;
+    border: 3px solid var(--amber);
+    padding: 4px;
+    background: var(--brown-dark);
+    box-shadow: 0 0 0 1px rgba(232,148,58,0.3), 0 12px 30px rgba(0,0,0,0.4);
+    animation: floatLogo 4s ease-in-out infinite;
+}
+.logo-ring-anim img {
+    width: 100%;
+    height: 100%;
+    border-radius: 50%;
+    object-fit: cover;
+    display: block;
+}
