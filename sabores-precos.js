@@ -12,8 +12,8 @@ window.CATALOGO_DOCES_FLOR = {
     sabores: {
         trads: [
             "Amendoim","Beijinho","Brigadeiro","Café","Chocotone","Dois Amores",
-            "Leite Ninho","Moranguinho (Nesquik)","Prestígio","Quebra Queixo",
-            "Sensação","Tapioca"
+            "Leite Ninho","Moranguinho (Nesquik)","Morango Ninho","Prestígio",
+            "Quebra Queixo","Sensação","Tapioca"
         ],
         gourmets: [
             "Banoffee","Black Cacau","Canjica","Chocolate Gourmet","Churros",
