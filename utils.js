@@ -68,3 +68,34 @@ function maskMoeda(v) {
     if (!v) return '';
     return 'R$ ' + (parseInt(v)/100).toFixed(2).replace('.',',');
 }
+
+/* ── DARK MODE ──
+   Roda assim que utils.js carrega (no <head>, antes do <body> renderizar),
+   pra já aplicar o tema salvo sem "piscar" a tela clara primeiro. ── */
+(function initTema() {
+    let salvo = null;
+    try { salvo = localStorage.getItem('docesflor_tema'); } catch(e) {}
+    const preferido = salvo || (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+    document.documentElement.setAttribute('data-theme', preferido);
+})();
+
+function aplicarTema(tema) {
+    document.documentElement.setAttribute('data-theme', tema);
+    try { localStorage.setItem('docesflor_tema', tema); } catch(e) {}
+    document.querySelectorAll('.btn-toggle-tema').forEach(btn => {
+        btn.textContent = tema === 'dark' ? '☀️' : '🌙';
+        btn.setAttribute('aria-label', tema === 'dark' ? 'Ativar modo claro' : 'Ativar modo escuro');
+    });
+}
+
+function alternarTema() {
+    const atual = document.documentElement.getAttribute('data-theme') === 'dark' ? 'dark' : 'light';
+    aplicarTema(atual === 'dark' ? 'light' : 'dark');
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+    const temaAtual = document.documentElement.getAttribute('data-theme') === 'dark' ? 'dark' : 'light';
+    document.querySelectorAll('.btn-toggle-tema').forEach(btn => {
+        btn.textContent = temaAtual === 'dark' ? '☀️' : '🌙';
+    });
+});
