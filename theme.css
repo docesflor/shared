@@ -32,6 +32,11 @@ html { scroll-behavior: smooth; }
     --red:           #e53935;
     --blue:          #5b8def;
 
+    /* fundo do círculo da logo — separado de --brown-dark de propósito:
+       o círculo continua escuro nos dois temas, só o texto que usa
+       --brown-dark é que precisa inverter no modo escuro */
+    --logo-ring-bg:  var(--brown-dark);
+
     /* aliases em português usados em pedidos.html */
     --laranja:        var(--amber);
     --laranja-escuro:  #C9522A;
@@ -43,6 +48,45 @@ html { scroll-behavior: smooth; }
     --verde:           var(--green);
     --branco:          var(--white);
 }
+
+/* ── MODO ESCURO ──
+   Ativado via atributo data-theme="dark" no <html> (ver shared/utils.js).
+   Como quase todo o site usa var(--cor) em vez de hex direto, trocar
+   estes valores já reflete na maioria das telas automaticamente. */
+[data-theme="dark"] {
+    --brown-dark:    #F3E4D0;
+    --brown-mid:     #E2B98D;
+    --brown-warm:    #C9A57C;
+    --cream:         #17110B;
+    --cream-dark:    #2A2018;
+    --white:         #221A12;
+    --text-body:     #EDE0CE;
+    --shadow:        rgba(0,0,0,0.45);
+    --shadow-strong: rgba(0,0,0,0.65);
+    --green:         #6FAE82;
+    --red:           #EF5350;
+    --blue:          #7FA8F5;
+    /* --logo-ring-bg NÃO é sobrescrita aqui de propósito — continua escura */
+}
+
+body { transition: background-color .2s ease, color .2s ease; }
+
+/* ── BOTÃO DE ALTERNAR TEMA ── */
+.btn-toggle-tema {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 38px;
+    height: 38px;
+    border-radius: 50%;
+    border: 1.5px solid var(--cream-dark);
+    background: var(--white);
+    color: var(--brown-dark);
+    font-size: 1.1rem;
+    cursor: pointer;
+    transition: background-color .2s ease, border-color .2s ease, transform .15s ease;
+}
+.btn-toggle-tema:hover { transform: scale(1.06); }
 
 /* ── BASE DO BODY (idêntico nos dois arquivos originais;
      cada site pode sobrescrever padding-top/overflow se precisar) ── */
@@ -67,7 +111,7 @@ body {
     border-radius: 50%;
     border: 3px solid var(--amber);
     padding: 4px;
-    background: var(--brown-dark);
+    background: var(--logo-ring-bg);
     box-shadow: 0 0 0 1px rgba(232,148,58,0.3), 0 12px 30px rgba(0,0,0,0.4);
     animation: floatLogo 4s ease-in-out infinite;
 }
