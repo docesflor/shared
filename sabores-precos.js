@@ -31,6 +31,16 @@ window.CATALOGO_DOCES_FLOR = {
         trad:    { 25: 35,  50: 60,  75: 85,  100: 110, avulso: 1.50 },
         frutas:  { 25: 40,  50: 70,  75: 100, 100: 125, avulso: 1.75 },
         gourmet: { 25: 45,  50: 80,  75: 115, 100: 140, avulso: 2.00 }
+    },
+
+    // categorias e descrições de gastos — fonte única
+    // (antes duplicado em pedidos-auth.js e pedidos-custos.js)
+    gastos: {
+        "Ingredientes": ["Leite condensado","Chocolate em pó","Manteiga","Creme de leite","Leite Ninho","Nutella","Pasta de amendoim","Coco ralado","Morango","Frutas variadas"],
+        "Embalagens":   ["Forminhas","Caixas 25 un","Caixas 50 un","Caixas 100 un","Fitas e laços","Papel celofane","Etiquetas"],
+        "Gás/Energia":  ["Gás de cozinha","Energia elétrica"],
+        "Entrega":      ["Combustível","Taxa de entrega app","Embalagem transporte"],
+        "Outros":       ["Luvas descartáveis","Papel toalha","Detergente / limpeza"]
     }
 };
 
