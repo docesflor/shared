@@ -32,10 +32,14 @@ html { scroll-behavior: smooth; }
     --red:           #e53935;
     --blue:          #5b8def;
 
-    /* fundo do círculo da logo — separado de --brown-dark de propósito:
-       o círculo continua escuro nos dois temas, só o texto que usa
-       --brown-dark é que precisa inverter no modo escuro */
-    --logo-ring-bg:  var(--brown-dark);
+    /* fundo "de marca" fixo — header, footer, login, gaveta, botões
+       marrons, badges, tabs ativas etc. NUNCA inverte com o tema. */
+    --surface-brand:      #2B1206;
+    --surface-brand-mid:  #5C2A0E;
+    --on-surface-brand:   #FDF8F0; /* texto claro fixo, usado em cima do --surface-brand */
+
+    /* fundo do círculo da logo — mesma lógica acima */
+    --logo-ring-bg:  var(--surface-brand);
 
     /* aliases em português usados em pedidos.html */
     --laranja:        var(--amber);
@@ -57,8 +61,8 @@ html { scroll-behavior: smooth; }
     --brown-dark:    #F3E4D0;
     --brown-mid:     #E2B98D;
     --brown-warm:    #C9A57C;
-    --cream:         #17110B;
-    --cream-dark:    #2A2018;
+    --cream:         #15100A;
+    --cream-dark:    #3D2F20;
     --white:         #221A12;
     --text-body:     #EDE0CE;
     --shadow:        rgba(0,0,0,0.45);
@@ -66,7 +70,9 @@ html { scroll-behavior: smooth; }
     --green:         #6FAE82;
     --red:           #EF5350;
     --blue:          #7FA8F5;
-    /* --logo-ring-bg NÃO é sobrescrita aqui de propósito — continua escura */
+    /* --surface-brand, --surface-brand-mid, --on-surface-brand e
+       --logo-ring-bg NÃO são sobrescritas aqui de propósito — header,
+       footer, login, gaveta e botões marrons continuam fixos nos dois temas */
 }
 
 body { transition: background-color .2s ease, color .2s ease; }
