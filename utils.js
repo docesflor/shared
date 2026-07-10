@@ -75,7 +75,7 @@ function maskMoeda(v) {
 (function initTema() {
     let salvo = null;
     try { salvo = localStorage.getItem('docesflor_tema'); } catch(e) {}
-    const preferido = salvo || (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+    const preferido = salvo || 'light';
     document.documentElement.setAttribute('data-theme', preferido);
 })();
 
