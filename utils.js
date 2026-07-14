@@ -12,8 +12,13 @@ function setVal(id, v) { const el = document.getElementById(id); if (el) el.valu
 
 function formatarValor(v) {
     if (!v && v !== 0) return '';
-    if (typeof v === 'number') return 'R$ ' + v.toFixed(2).replace('.',',');
+    if (typeof v === 'number') return formatarBRL(v);
     return v;
+}
+
+function formatarBRL(v) {
+    v = Number(v) || 0;
+    return 'R$ ' + v.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
 }
 
 function escaparHTML(str) {
