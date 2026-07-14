@@ -66,7 +66,12 @@ function maskCEP(v) { return v.replace(/\D/g,'').replace(/(\d{5})(\d{1,3})/,'$1-
 function maskMoeda(v) {
     v = v.replace(/\D/g,'');
     if (!v) return '';
-    return 'R$ ' + (parseInt(v)/100).toFixed(2).replace('.',',');
+    v = v.replace(/^0+(?=\d)/, '');
+    while (v.length < 3) v = '0' + v;
+    const decimal = v.slice(-2);
+    let inteiro = v.slice(0, -2).replace(/^0+(?=\d)/, '') || '0';
+    inteiro = inteiro.replace(/\B(?=(\d{3})+(?!\d))/g, '.');
+    return 'R$ ' + inteiro + ',' + decimal;
 }
 
 /* ── DARK MODE ──
