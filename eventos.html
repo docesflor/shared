@@ -122,6 +122,15 @@
 
   .vazio{ text-align:center; padding:30px 10px; color:var(--cacau-2); font-size:14px; }
 
+  /* Cartões de venda */
+  .cartao-venda{ display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:14px; }
+  .cartao-venda .nome-produto{ font-weight:700; font-size:15px; }
+  .cartao-venda .preco-produto{ font-size:12px; color:var(--cacau-2); margin-top:2px; }
+  .metrica-venda{ text-align:center; min-width:56px; }
+  .metrica-venda .rotulo-mini{ font-size:10.5px; color:var(--cacau-2); font-weight:700; text-transform:uppercase; letter-spacing:.03em; }
+  .metrica-venda .valor-mini{ font-size:20px; font-weight:700; margin-top:2px; }
+  .acoes-venda{ display:flex; gap:6px; }
+
   /* Modal */
   .overlay{
     display:none; position:fixed; inset:0; background:rgba(74,47,35,0.45); z-index:50;
@@ -169,6 +178,10 @@
     .stat{ padding:12px 14px; }
     .stat .valor{ font-size:19px; }
 
+    .cartao-venda{ flex-direction:column; align-items:stretch; }
+    .cartao-venda .linha-metricas{ display:flex; justify-content:space-between; }
+    .acoes-venda .btn{ flex:1; }
+
     /* Tabelas: permite rolar na horizontal em vez de espremer colunas */
     .cartao > div > table, .cartao table{ display:block; }
     table{ font-size:12px; width:max-content; min-width:100%; }
@@ -195,12 +208,16 @@
     <h1><span class="bite"></span> Eventos</h1>
     <div class="seletor-evento">
       <select id="seletorEvento"><option value="">Carregando eventos...</option></select>
-      <button class="btn btn-secundario" onclick="abrirModalEvento()">+ Novo evento</button>
+      <button class="btn btn-secundario" onclick="abrirModalEvento()">+ Novo</button>
+      <button class="btn btn-secundario" onclick="abrirModalEventoParaEditar()">Editar</button>
+      <button class="btn btn-perigo btn-sm" onclick="excluirEvento()">Excluir</button>
+      <button class="btn btn-secundario" onclick="fazerLogout()">Sair</button>
     </div>
   </div>
   <nav class="abas">
     <button class="ativo" data-aba="compras" onclick="mudarAba('compras')">Compras</button>
     <button data-aba="produtos" onclick="mudarAba('produtos')">Produtos</button>
+    <button data-aba="vendas" onclick="mudarAba('vendas')">Vendas</button>
     <button data-aba="dashboard" onclick="mudarAba('dashboard')">Dashboard</button>
   </nav>
 </header>
@@ -267,7 +284,7 @@
           <input type="number" id="compraCusto" step="0.01" placeholder="0,00">
         </div>
         <div class="campo">
-          <button class="btn btn-primario" onclick="salvarCompra()">Adicionar</button>
+          <button class="btn btn-primario" id="btnSalvarCompra" onclick="salvarCompra()">Adicionar</button>
         </div>
       </div>
     </div>
@@ -291,10 +308,6 @@
           <input type="text" id="produtoNome" placeholder="Ex: Cookie Nutella">
         </div>
         <div class="campo">
-          <label>Qtd. produzida (opcional)</label>
-          <input type="number" id="produtoQtd" step="1" placeholder="definir depois">
-        </div>
-        <div class="campo">
           <label>Receita (custo automático)</label>
           <button class="btn btn-secundario" style="color:var(--cacau); border-color:var(--linha);" onclick="abrirModalReceita()">
             🧾 Montar receita <span id="resumoReceitaBtn" class="mono"></span>
@@ -305,7 +318,7 @@
           <input type="number" id="produtoPreco" step="0.01" placeholder="0,00">
         </div>
         <div class="campo">
-          <button class="btn btn-primario" onclick="salvarProduto()">Adicionar</button>
+          <button class="btn btn-primario" id="btnSalvarProduto" onclick="salvarProduto()">Adicionar</button>
         </div>
       </div>
     </div>
@@ -314,6 +327,25 @@
       <div class="cabecalho-secao"><h2>Produtos do evento</h2></div>
       <div id="listaProdutos" style="overflow-x:auto; -webkit-overflow-scrolling:touch;"><div class="vazio">Nenhum produto cadastrado ainda.</div></div>
     </div>
+  </section>
+
+  <!-- ABA VENDAS -->
+  <section class="secao" id="secao-vendas">
+    <div class="grid-cards" style="margin-bottom:18px;">
+      <div class="stat destaque">
+        <div class="rotulo">Faturamento</div>
+        <div class="valor mono" id="statVendasFaturamento">R$ 0,00</div>
+      </div>
+      <div class="stat">
+        <div class="rotulo">Produzidos</div>
+        <div class="valor mono" id="statVendasProduzidos">0</div>
+      </div>
+      <div class="stat">
+        <div class="rotulo">Restantes</div>
+        <div class="valor mono" id="statVendasRestantes">0</div>
+      </div>
+    </div>
+    <div id="listaVendas"><div class="vazio">Cadastre produtos para lançar vendas.</div></div>
   </section>
 
   <!-- ABA DASHBOARD -->
@@ -356,16 +388,36 @@
         O <strong>total investido</strong> vem da soma das compras registradas.
         O <strong>custo médio por unidade</strong> divide esse total pelas unidades produzidas — compare com o
         custo unitário que você lançou em cada produto para saber se as compras estão batendo com a estimativa.
+        A <strong>receita projetada</strong> considera toda a quantidade produzida; para o valor realmente faturado
+        (baseado no que já foi vendido), veja a aba <strong>Vendas</strong>.
       </p>
     </div>
   </section>
 
 </main>
 
-<!-- MODAL NOVO EVENTO -->
+<!-- TELA DE LOGIN -->
+<div class="overlay ativo" id="overlayLogin" style="z-index:60;">
+  <div class="modal">
+    <h3>Entrar</h3>
+    <div class="campo">
+      <label>E-mail</label>
+      <input type="email" id="loginEmail" placeholder="seu@email.com">
+    </div>
+    <div class="campo">
+      <label>Senha</label>
+      <input type="password" id="loginSenha" placeholder="••••••••" onkeydown="if(event.key==='Enter') fazerLogin();">
+    </div>
+    <div class="modal-acoes" style="justify-content:stretch;">
+      <button class="btn btn-primario" style="width:100%;" onclick="fazerLogin()">Entrar</button>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL NOVO/EDITAR EVENTO -->
 <div class="overlay" id="overlayEvento">
   <div class="modal">
-    <h3>Novo evento</h3>
+    <h3 id="tituloModalEvento">Novo evento</h3>
     <div class="campo">
       <label>Nome do evento</label>
       <input type="text" id="novoEventoNome" placeholder="Ex: Feira de Julho 2026">
@@ -376,7 +428,7 @@
     </div>
     <div class="modal-acoes">
       <button class="btn btn-secundario" style="color:var(--cacau); border-color:var(--linha);" onclick="fecharModalEvento()">Cancelar</button>
-      <button class="btn btn-primario" onclick="criarEvento()">Criar evento</button>
+      <button class="btn btn-primario" onclick="salvarEvento()">Salvar</button>
     </div>
   </div>
 </div>
@@ -432,16 +484,34 @@ const auth = firebase.auth();
 const RAIZ = "eventosCookies";
 
 let eventoAtual = null;
+let eventoEditandoId = null;
+let compraEditandoId = null;
 let cacheCompras = {};
 let cacheProdutos = {};
 
+/* ---------------- Login / Logout ---------------- */
+function fazerLogin(){
+  const email = document.getElementById('loginEmail').value.trim();
+  const senha = document.getElementById('loginSenha').value;
+  if(!email || !senha){ mostrarToast('Preencha e-mail e senha'); return; }
+  auth.signInWithEmailAndPassword(email, senha)
+    .catch(err => mostrarToast('Erro ao entrar: ' + err.message));
+}
+function fazerLogout(){
+  auth.signOut();
+}
+
 // Só carrega dados depois de confirmar que há um usuário autenticado
 auth.onAuthStateChanged(user => {
+  const overlayLogin = document.getElementById('overlayLogin');
   if (!user) {
-    mostrarToast('Você precisa estar logado como admin para acessar eventos.');
+    overlayLogin.classList.add('ativo');
     document.getElementById('seletorEvento').innerHTML = '<option value="">Faça login primeiro</option>';
     return;
   }
+  overlayLogin.classList.remove('ativo');
+  document.getElementById('loginEmail').value = '';
+  document.getElementById('loginSenha').value = '';
   carregarEventos();
 });
 
@@ -461,6 +531,7 @@ function mudarAba(nome){
   document.getElementById('secao-' + nome).classList.add('ativa');
   document.querySelector(`nav.abas button[data-aba="${nome}"]`).classList.add('ativo');
   if(nome === 'dashboard') renderizarDashboard();
+  if(nome === 'vendas') renderizarVendas();
 }
 
 function alternarItemPersonalizado(){
@@ -471,28 +542,70 @@ function alternarItemPersonalizado(){
 
 /* ---------------- Eventos ---------------- */
 function abrirModalEvento(){
+  eventoEditandoId = null;
+  document.getElementById('tituloModalEvento').textContent = 'Novo evento';
+  document.getElementById('novoEventoNome').value = '';
+  document.getElementById('novoEventoData').value = '';
   document.getElementById('overlayEvento').classList.add('ativo');
+}
+function abrirModalEventoParaEditar(){
+  if(!eventoAtual){ mostrarToast('Selecione um evento primeiro'); return; }
+  db.ref(`${RAIZ}/eventos/${eventoAtual}`).once('value').then(snap => {
+    const ev = snap.val();
+    if(!ev){ mostrarToast('Evento não encontrado'); return; }
+    eventoEditandoId = eventoAtual;
+    document.getElementById('tituloModalEvento').textContent = 'Editar evento';
+    document.getElementById('novoEventoNome').value = ev.nome || '';
+    document.getElementById('novoEventoData').value = ev.data || '';
+    document.getElementById('overlayEvento').classList.add('ativo');
+  }).catch(err => mostrarToast('Erro: ' + err.message));
 }
 function fecharModalEvento(){
   document.getElementById('overlayEvento').classList.remove('ativo');
   document.getElementById('novoEventoNome').value = '';
   document.getElementById('novoEventoData').value = '';
+  eventoEditandoId = null;
 }
-function criarEvento(){
+function salvarEvento(){
   const nome = document.getElementById('novoEventoNome').value.trim();
   const data = document.getElementById('novoEventoData').value;
   if(!nome){ mostrarToast('Dê um nome para o evento'); return; }
-  const ref = db.ref(`${RAIZ}/eventos`).push();
-  ref.set({
-    nome: nome,
-    data: data || null,
-    criadoEm: Date.now(),
-    status: 'ativo'
-  }).then(()=>{
-    mostrarToast('Evento criado!');
-    fecharModalEvento();
-    selecionarEvento(ref.key);
-  }).catch(err => mostrarToast('Erro ao criar evento: ' + err.message));
+
+  if(eventoEditandoId){
+    const id = eventoEditandoId;
+    db.ref(`${RAIZ}/eventos/${id}`).update({ nome, data: data || null }).then(()=>{
+      mostrarToast('Evento atualizado!');
+      fecharModalEvento();
+    }).catch(err => mostrarToast('Erro ao atualizar evento: ' + err.message));
+  } else {
+    const ref = db.ref(`${RAIZ}/eventos`).push();
+    ref.set({
+      nome: nome,
+      data: data || null,
+      criadoEm: Date.now(),
+      status: 'ativo'
+    }).then(()=>{
+      mostrarToast('Evento criado!');
+      fecharModalEvento();
+      selecionarEvento(ref.key);
+    }).catch(err => mostrarToast('Erro ao criar evento: ' + err.message));
+  }
+}
+function excluirEvento(){
+  if(!eventoAtual){ mostrarToast('Selecione um evento primeiro'); return; }
+  const selecao = document.getElementById('seletorEvento');
+  const nomeEvento = selecao.selectedOptions[0] ? selecao.selectedOptions[0].textContent : 'este evento';
+  if(!confirm(`Excluir "${nomeEvento}"?\n\nIsso apaga também todas as compras e produtos deste evento. Essa ação não pode ser desfeita.`)) return;
+
+  const id = eventoAtual;
+  Promise.all([
+    db.ref(`${RAIZ}/eventos/${id}`).remove(),
+    db.ref(`${RAIZ}/compras/${id}`).remove(),
+    db.ref(`${RAIZ}/produtos/${id}`).remove()
+  ]).then(()=>{
+    mostrarToast('Evento excluído');
+    eventoAtual = null;
+  }).catch(err => mostrarToast('Erro ao excluir evento: ' + err.message));
 }
 
 function carregarEventos(){
@@ -504,6 +617,7 @@ function carregarEventos(){
     const ids = Object.keys(eventos);
     if(ids.length === 0){
       select.innerHTML = '<option value="">Nenhum evento — crie um</option>';
+      eventoAtual = null;
       return;
     }
     ids.sort((a,b) => (eventos[b].criadoEm||0) - (eventos[a].criadoEm||0));
@@ -539,7 +653,7 @@ function selecionarEvento(id){
 /* ---------------- Compras ---------------- */
 function salvarCompra(){
   if(!eventoAtual){ mostrarToast('Selecione ou crie um evento primeiro'); return; }
-    let item = document.getElementById('compraItem').value;
+  let item = document.getElementById('compraItem').value;
   if(item === 'outro'){
     item = document.getElementById('compraItemPersonalizado').value.trim();
   }
@@ -553,17 +667,52 @@ function salvarCompra(){
     return;
   }
 
-  db.ref(`${RAIZ}/compras/${eventoAtual}`).push({
+  const dataOriginal = compraEditandoId && cacheCompras[compraEditandoId] ? cacheCompras[compraEditandoId].data : Date.now();
+
+  const dados = {
     item, categoria, quantidade: isNaN(qtd) ? 0 : qtd, unidade,
-    custoTotal: custo, data: Date.now()
-  }).then(()=>{
-    mostrarToast('Compra registrada!');
+    custoTotal: custo, data: dataOriginal
+  };
+
+  const ref = compraEditandoId
+    ? db.ref(`${RAIZ}/compras/${eventoAtual}/${compraEditandoId}`)
+    : db.ref(`${RAIZ}/compras/${eventoAtual}`).push();
+
+  ref.set(dados).then(()=>{
+    mostrarToast(compraEditandoId ? 'Compra atualizada!' : 'Compra registrada!');
     document.getElementById('compraItem').value = '';
     document.getElementById('compraItemPersonalizado').value = '';
     document.getElementById('campoItemPersonalizado').style.display = 'none';
     document.getElementById('compraQtd').value = '';
     document.getElementById('compraCusto').value = '';
+    document.getElementById('compraCategoria').value = 'insumo';
+    document.getElementById('compraUnidade').value = 'kg';
+    document.getElementById('btnSalvarCompra').textContent = 'Adicionar';
+    compraEditandoId = null;
   }).catch(err => mostrarToast('Erro: ' + err.message));
+}
+
+function editarCompra(id){
+  const c = cacheCompras[id];
+  if(!c) return;
+  compraEditandoId = id;
+  const select = document.getElementById('compraItem');
+  const opcoesExistentes = Array.from(select.options).map(o => o.value);
+  if(opcoesExistentes.includes(c.item)){
+    select.value = c.item;
+    document.getElementById('campoItemPersonalizado').style.display = 'none';
+  } else {
+    select.value = 'outro';
+    document.getElementById('compraItemPersonalizado').value = c.item;
+    document.getElementById('campoItemPersonalizado').style.display = 'flex';
+  }
+  document.getElementById('compraCategoria').value = c.categoria || 'insumo';
+  document.getElementById('compraQtd').value = c.quantidade || '';
+  document.getElementById('compraUnidade').value = c.unidade || 'kg';
+  document.getElementById('compraCusto').value = c.custoTotal || '';
+  document.getElementById('btnSalvarCompra').textContent = 'Salvar edição';
+  mostrarToast('Editando compra — ajuste os campos e clique em Salvar edição');
+  window.scrollTo({ top: 0, behavior: 'smooth' });
 }
 
 function escutarCompras(eventoId){
@@ -593,7 +742,10 @@ function renderizarCompras(){
       <td><span class="tag">${c.categoria}</span></td>
       <td class="num">${(c.quantidade||0)} ${c.unidade}</td>
       <td class="num mono">${formatarMoeda(c.custoTotal)}</td>
-      <td class="num"><button class="icon-btn" onclick="excluirCompra('${id}')">Excluir</button></td>
+      <td class="num" style="white-space:nowrap;">
+        <button class="icon-btn" style="color:var(--cacau-2);" onclick="editarCompra('${id}')">Editar</button>
+        <button class="icon-btn" onclick="excluirCompra('${id}')">Excluir</button>
+      </td>
     </tr>`;
   });
   cont.innerHTML = `<table>
@@ -647,7 +799,6 @@ function renderizarModalReceita(){
     const marcado = receitaEmEdicao.hasOwnProperty(id);
     // receitaEmEdicao guarda sempre na unidade DA COMPRA (kg, l, etc) — aqui convertemos só pra exibir
     const info = unidadeReceitaInfo(c.unidade);
-    const valorBase = marcado ? receitaEmEdicao[id] : '';
     const valorExibido = marcado ? (receitaEmEdicao[id] * info.fator) : '';
     const custoUn = custoPorUnidadeCompra(c);
     return `
@@ -719,8 +870,6 @@ function calcularCustoProduto(produto){
 function salvarProduto(){
   if(!eventoAtual){ mostrarToast('Selecione ou crie um evento primeiro'); return; }
   const nome = document.getElementById('produtoNome').value.trim();
-  const qtdCampo = document.getElementById('produtoQtd').value;
-  const qtd = qtdCampo === '' ? 0 : parseFloat(qtdCampo);
   const preco = parseFloat(document.getElementById('produtoPreco').value);
 
   if(!nome){
@@ -733,10 +882,14 @@ function salvarProduto(){
   }
 
   const custoCalculado = calcularCustoPorReceita(receitaEmEdicao);
+  // Quantidade produzida e vendido agora são controlados na aba Vendas —
+  // aqui só preservamos o que já existia ao editar um produto.
+  const existente = produtoEditandoId ? (cacheProdutos[produtoEditandoId] || {}) : {};
 
   const dados = {
     nome,
-    quantidadeProduzida: qtd,
+    quantidadeProduzida: existente.quantidadeProduzida || 0,
+    vendido: existente.vendido || 0,
     custoUnitario: custoCalculado,
     precoVenda: isNaN(preco) ? 0 : preco,
     receita: receitaEmEdicao
@@ -749,9 +902,9 @@ function salvarProduto(){
   ref.set(dados).then(()=>{
     mostrarToast(produtoEditandoId ? 'Produto atualizado!' : 'Produto cadastrado!');
     document.getElementById('produtoNome').value = '';
-    document.getElementById('produtoQtd').value = '';
     document.getElementById('produtoPreco').value = '';
     document.getElementById('resumoReceitaBtn').textContent = '';
+    document.getElementById('btnSalvarProduto').textContent = 'Adicionar';
     receitaEmEdicao = {};
     produtoEditandoId = null;
   }).catch(err => mostrarToast('Erro: ' + err.message));
@@ -762,12 +915,12 @@ function editarProduto(id){
   if(!p) return;
   produtoEditandoId = id;
   document.getElementById('produtoNome').value = p.nome;
-  document.getElementById('produtoQtd').value = p.quantidadeProduzida;
   document.getElementById('produtoPreco').value = p.precoVenda;
   receitaEmEdicao = { ...(p.receita || {}) };
   document.getElementById('resumoReceitaBtn').textContent =
     Object.keys(receitaEmEdicao).length > 0 ? `(${formatarMoeda(calcularCustoPorReceita(receitaEmEdicao))}/un)` : '';
-  mostrarToast('Editando produto — ajuste os campos e clique em Adicionar para salvar');
+  document.getElementById('btnSalvarProduto').textContent = 'Salvar edição';
+  mostrarToast('Editando produto — ajuste os campos e clique em Salvar edição');
 }
 
 function escutarProdutos(eventoId){
@@ -775,6 +928,7 @@ function escutarProdutos(eventoId){
     cacheProdutos = snap.val() || {};
     renderizarProdutos();
     if(document.getElementById('secao-dashboard').classList.contains('ativa')) renderizarDashboard();
+    if(document.getElementById('secao-vendas').classList.contains('ativa')) renderizarVendas();
   });
 }
 
@@ -789,20 +943,13 @@ function renderizarProdutos(){
   ids.forEach(id => {
     const p = cacheProdutos[id];
     const custoUnitario = calcularCustoProduto(p);
-    const custoTotal = custoUnitario * (p.quantidadeProduzida||0);
-    const receitaTotal = (p.precoVenda||0) * (p.quantidadeProduzida||0);
-    const lucro = receitaTotal - custoTotal;
-    const margem = receitaTotal > 0 ? (lucro / receitaTotal * 100) : 0;
+    const lucroUn = (p.precoVenda||0) - custoUnitario;
+    const margem = (p.precoVenda||0) > 0 ? (lucroUn / p.precoVenda * 100) : 0;
     linhas += `<tr>
       <td>${p.nome}</td>
-      <td class="num">
-        <input type="number" min="0" step="1" value="${p.quantidadeProduzida || ''}" placeholder="0"
-          onchange="atualizarQtdProduzida('${id}', this.value)"
-          style="width:64px; text-align:right; border:1px solid var(--linha); border-radius:6px; padding:6px; font-size:16px; background:var(--cream);">
-      </td>
       <td class="num mono">${formatarMoeda(custoUnitario)}</td>
       <td class="num mono">${formatarMoeda(p.precoVenda)}</td>
-      <td class="num mono ${lucro >= 0 ? 'lucro-pos' : 'lucro-neg'}">${formatarMoeda(lucro)}</td>
+      <td class="num mono ${lucroUn >= 0 ? 'lucro-pos' : 'lucro-neg'}">${formatarMoeda(lucroUn)}</td>
       <td class="num">${margem.toFixed(0)}%</td>
       <td class="num" style="white-space:nowrap;">
         <button class="icon-btn" style="color:var(--cacau-2);" onclick="editarProduto('${id}')">Editar</button>
@@ -812,8 +959,8 @@ function renderizarProdutos(){
   });
   cont.innerHTML = `<table>
     <thead><tr>
-      <th>Produto</th><th class="num">Qtd</th><th class="num">Custo un.</th>
-      <th class="num">Venda un.</th><th class="num">Lucro total</th><th class="num">Margem</th><th></th>
+      <th>Produto</th><th class="num">Custo un.</th>
+      <th class="num">Venda un.</th><th class="num">Lucro un.</th><th class="num">Margem</th><th></th>
     </tr></thead>
     <tbody>${linhas}</tbody>
   </table>`;
@@ -830,6 +977,89 @@ function excluirProduto(id){
   db.ref(`${RAIZ}/produtos/${eventoAtual}/${id}`).remove()
     .then(()=> mostrarToast('Produto removido'))
     .catch(err => mostrarToast('Erro: ' + err.message));
+}
+
+/* ---------------- Vendas ---------------- */
+function venderUnidade(id){
+  const p = cacheProdutos[id];
+  if(!p) return;
+  const restante = (p.quantidadeProduzida||0) - (p.vendido||0);
+  if(restante <= 0){
+    mostrarToast('Não há unidades produzidas restantes para vender');
+    return;
+  }
+  db.ref(`${RAIZ}/produtos/${eventoAtual}/${id}/vendido`).transaction(v => (v||0) + 1)
+    .then(()=> mostrarToast('Venda registrada!'))
+    .catch(err => mostrarToast('Erro: ' + err.message));
+}
+
+function desfazerVenda(id){
+  const p = cacheProdutos[id];
+  if(!p || !(p.vendido > 0)){
+    mostrarToast('Nenhuma venda para desfazer');
+    return;
+  }
+  db.ref(`${RAIZ}/produtos/${eventoAtual}/${id}/vendido`).transaction(v => Math.max((v||0) - 1, 0))
+    .then(()=> mostrarToast('Venda desfeita'))
+    .catch(err => mostrarToast('Erro: ' + err.message));
+}
+
+function renderizarVendas(){
+  const cont = document.getElementById('listaVendas');
+  const ids = Object.keys(cacheProdutos);
+
+  const totalProduzidos = ids.reduce((s,id) => s + (cacheProdutos[id].quantidadeProduzida||0), 0);
+  const totalVendidos = ids.reduce((s,id) => s + (cacheProdutos[id].vendido||0), 0);
+  const totalFaturamento = ids.reduce((s,id) => s + (cacheProdutos[id].vendido||0) * (cacheProdutos[id].precoVenda||0), 0);
+  const totalRestantes = totalProduzidos - totalVendidos;
+
+  document.getElementById('statVendasFaturamento').textContent = formatarMoeda(totalFaturamento);
+  document.getElementById('statVendasProduzidos').textContent = totalProduzidos;
+  document.getElementById('statVendasRestantes').textContent = totalRestantes;
+
+  if(ids.length === 0){
+    cont.innerHTML = '<div class="vazio">Cadastre produtos para lançar vendas.</div>';
+    return;
+  }
+
+  let html = '';
+  ids.forEach(id => {
+    const p = cacheProdutos[id];
+    const produzido = p.quantidadeProduzida || 0;
+    const vendido = p.vendido || 0;
+    const restante = produzido - vendido;
+    const faturado = vendido * (p.precoVenda || 0);
+    html += `<div class="cartao cartao-venda">
+      <div>
+        <div class="nome-produto">${p.nome}</div>
+        <div class="preco-produto mono">${formatarMoeda(p.precoVenda)} / un</div>
+        <div class="campo" style="width:110px; margin-top:8px;">
+          <label>Produzido</label>
+          <input type="number" min="0" step="1" value="${produzido || ''}" placeholder="0"
+            onchange="atualizarQtdProduzida('${id}', this.value)">
+        </div>
+      </div>
+      <div class="linha-metricas" style="display:flex; gap:18px;">
+        <div class="metrica-venda">
+          <div class="rotulo-mini">Vendido</div>
+          <div class="valor-mini mono">${vendido}</div>
+        </div>
+        <div class="metrica-venda">
+          <div class="rotulo-mini">Resta</div>
+          <div class="valor-mini mono" style="color:${restante > 0 ? 'var(--verde)' : 'var(--vermelho)'};">${restante}</div>
+        </div>
+        <div class="metrica-venda">
+          <div class="rotulo-mini">Faturado</div>
+          <div class="valor-mini mono">${formatarMoeda(faturado)}</div>
+        </div>
+      </div>
+      <div class="acoes-venda">
+        <button class="btn btn-primario" onclick="venderUnidade('${id}')">+1 venda</button>
+        <button class="btn btn-secundario" style="color:var(--cacau); border-color:var(--linha);" onclick="desfazerVenda('${id}')">-1</button>
+      </div>
+    </div>`;
+  });
+  cont.innerHTML = html;
 }
 
 /* ---------------- Dashboard ---------------- */
