@@ -1,0 +1,823 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Doces Flor — Eventos de Cookies</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&family=Figtree:wght@400;500;600;700&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --cream:#FBF3E6;
+    --cream-2:#F3E6D3;
+    --cacau:#4A2F23;
+    --cacau-2:#6B4A38;
+    --caramelo:#C97D3D;
+    --caramelo-2:#E3A15E;
+    --verde:#6B8F71;
+    --vermelho:#C0604F;
+    --linha:#E4D3BC;
+    --branco:#FFFDF9;
+    --sombra: 0 2px 10px rgba(74,47,35,0.08);
+    --sombra-2: 0 8px 24px rgba(74,47,35,0.14);
+  }
+  *{box-sizing:border-box;}
+  body{
+    margin:0;
+    background:var(--cream);
+    color:var(--cacau);
+    font-family:'Figtree', sans-serif;
+    padding-bottom:60px;
+  }
+  h1,h2,h3{ font-family:'Fraunces', serif; font-weight:600; margin:0; }
+  .mono{ font-family:'JetBrains Mono', monospace; }
+
+  header.topo{
+    background:var(--cacau);
+    color:var(--cream);
+    padding:22px 20px 18px;
+    position:sticky; top:0; z-index:20;
+    box-shadow:var(--sombra-2);
+  }
+  header.topo .linha1{ display:flex; align-items:center; justify-content:space-between; gap:12px; flex-wrap:wrap; }
+  header.topo h1{ font-size:22px; display:flex; align-items:center; gap:8px; }
+  header.topo h1 span.bite{
+    display:inline-block; width:22px; height:22px; border-radius:50%;
+    background:var(--caramelo-2);
+    position:relative; overflow:hidden;
+  }
+  header.topo h1 span.bite::after{
+    content:''; position:absolute; width:14px; height:14px; border-radius:50%;
+    background:var(--cacau); top:-6px; right:-6px;
+  }
+
+  .seletor-evento{ display:flex; gap:8px; align-items:center; flex-wrap:wrap; }
+  select, input, button{ font-family:'Figtree', sans-serif; }
+  select#seletorEvento{
+    background:var(--cacau-2); color:var(--cream); border:1px solid var(--caramelo);
+    border-radius:8px; padding:9px 12px; font-size:14px; max-width:220px;
+  }
+  .btn{
+    border:none; border-radius:8px; padding:9px 16px; font-size:14px; font-weight:600;
+    cursor:pointer; transition:transform .12s ease, box-shadow .12s ease;
+  }
+  .btn:active{ transform:scale(0.97); }
+  .btn-primario{ background:var(--caramelo); color:var(--branco); }
+  .btn-primario:hover{ background:var(--caramelo-2); }
+  .btn-secundario{ background:transparent; color:var(--cream); border:1px solid var(--caramelo); }
+  .btn-perigo{ background:var(--vermelho); color:var(--branco); }
+  .btn-sm{ padding:5px 10px; font-size:12px; border-radius:6px; }
+  .btn[disabled]{ opacity:.5; cursor:not-allowed; }
+
+  nav.abas{
+    display:flex; gap:4px; margin-top:14px; border-top:1px solid rgba(255,255,255,0.15); padding-top:12px;
+  }
+  nav.abas button{
+    background:transparent; border:none; color:var(--cream); opacity:.6;
+    font-size:14px; font-weight:600; padding:8px 14px; border-radius:8px 8px 0 0; cursor:pointer;
+  }
+  nav.abas button.ativo{ opacity:1; background:var(--cream); color:var(--cacau); }
+
+  main{ max-width:1000px; margin:0 auto; padding:24px 20px; }
+  .secao{ display:none; }
+  .secao.ativa{ display:block; animation:surgir .25s ease; }
+  @keyframes surgir{ from{opacity:0; transform:translateY(6px);} to{opacity:1; transform:translateY(0);} }
+
+  .cartao{
+    background:var(--branco); border:1px solid var(--linha); border-radius:14px;
+    padding:18px 20px; box-shadow:var(--sombra); margin-bottom:18px;
+  }
+  .cabecalho-secao{ display:flex; justify-content:space-between; align-items:center; margin-bottom:14px; flex-wrap:wrap; gap:10px; }
+  .cabecalho-secao h2{ font-size:19px; }
+
+  /* Formulários */
+  .form-grid{ display:grid; grid-template-columns:repeat(auto-fit,minmax(140px,1fr)); gap:10px; align-items:end; }
+  .campo{ display:flex; flex-direction:column; gap:4px; }
+  .campo label{ font-size:12px; color:var(--cacau-2); font-weight:600; }
+  .campo input, .campo select{
+    border:1px solid var(--linha); border-radius:8px; padding:9px 10px; font-size:14px; background:var(--cream);
+    color:var(--cacau);
+  }
+  .campo input:focus, .campo select:focus{ outline:2px solid var(--caramelo-2); border-color:var(--caramelo); }
+  .aviso-edicao{
+    display:none; align-items:center; justify-content:space-between; gap:10px;
+    background:var(--cream-2); border:1px solid var(--caramelo-2); border-radius:8px;
+    padding:8px 12px; font-size:12.5px; color:var(--cacau-2); font-weight:600; margin-bottom:10px;
+  }
+  .aviso-edicao.ativo{ display:flex; }
+
+  /* Tabelas */
+  table{ width:100%; border-collapse:collapse; font-size:13.5px; }
+  th{ text-align:left; padding:9px 8px; color:var(--cacau-2); font-size:11.5px; text-transform:uppercase; letter-spacing:.03em; border-bottom:2px solid var(--linha); }
+  td{ padding:10px 8px; border-bottom:1px solid var(--linha); }
+  tr.total-row td{ font-weight:700; border-top:2px solid var(--cacau); border-bottom:none; }
+  .num{ text-align:right; }
+  .tag{ display:inline-block; padding:2px 8px; border-radius:20px; font-size:11px; font-weight:600; background:var(--cream-2); color:var(--cacau-2); }
+  .tag.encerrado{ background:var(--vermelho); color:var(--branco); }
+  .lucro-pos{ color:var(--verde); font-weight:700; }
+  .lucro-neg{ color:var(--vermelho); font-weight:700; }
+  .acoes-linha{ display:flex; gap:10px; justify-content:flex-end; }
+
+  /* Dashboard */
+  .grid-cards{ display:grid; grid-template-columns:repeat(auto-fit,minmax(190px,1fr)); gap:14px; }
+  .stat{
+    background:var(--branco); border:1px solid var(--linha); border-radius:14px; padding:16px 18px;
+    box-shadow:var(--sombra);
+  }
+  .stat .rotulo{ font-size:12px; color:var(--cacau-2); font-weight:600; text-transform:uppercase; letter-spacing:.03em; }
+  .stat .valor{ font-family:'JetBrains Mono', monospace; font-size:24px; font-weight:700; margin-top:6px; }
+  .stat.destaque{ background:var(--cacau); color:var(--cream); }
+  .stat.destaque .rotulo{ color:var(--caramelo-2); }
+
+  .vazio{ text-align:center; padding:30px 10px; color:var(--cacau-2); font-size:14px; }
+
+  /* Modal */
+  .overlay{
+    display:none; position:fixed; inset:0; background:rgba(74,47,35,0.45); z-index:50;
+    align-items:center; justify-content:center; padding:20px;
+  }
+  .overlay.ativo{ display:flex; }
+  .modal{
+    background:var(--branco); border-radius:16px; padding:22px; max-width:420px; width:100%;
+    box-shadow:var(--sombra-2); animation:surgir .2s ease;
+  }
+  .modal h3{ margin-bottom:14px; }
+  .modal .campo{ margin-bottom:10px; }
+  .modal-acoes{ display:flex; justify-content:flex-end; gap:8px; margin-top:12px; }
+
+  .icon-btn{ background:none; border:none; cursor:pointer; color:var(--vermelho); font-size:13px; font-weight:600; }
+  .icon-btn.editar{ color:var(--caramelo); }
+
+  #toast{
+    position:fixed; bottom:20px; left:50%; transform:translateX(-50%) translateY(20px);
+    background:var(--cacau); color:var(--cream); padding:12px 20px; border-radius:10px;
+    font-size:14px; opacity:0; transition:all .25s ease; z-index:100; box-shadow:var(--sombra-2);
+  }
+  #toast.mostrar{ opacity:1; transform:translateX(-50%) translateY(0); }
+
+  @media (max-width:640px){
+    .cabecalho-secao{ flex-direction:column; align-items:flex-start; }
+    table{ font-size:12px; }
+    th, td{ padding:7px 5px; }
+  }
+</style>
+</head>
+<body>
+
+<header class="topo">
+  <div class="linha1">
+    <h1><span class="bite"></span> Eventos</h1>
+    <div class="seletor-evento">
+      <select id="seletorEvento"><option value="">Carregando eventos...</option></select>
+      <button class="btn btn-secundario" onclick="abrirModalEvento()">+ Novo evento</button>
+      <button class="btn btn-secundario" id="btnStatusEvento" onclick="alternarStatusEvento()">•</button>
+    </div>
+  </div>
+  <nav class="abas">
+    <button class="ativo" data-aba="compras" onclick="mudarAba('compras')">Compras</button>
+    <button data-aba="produtos" onclick="mudarAba('produtos')">Produtos</button>
+    <button data-aba="dashboard" onclick="mudarAba('dashboard')">Dashboard</button>
+  </nav>
+</header>
+
+<main>
+
+  <!-- ABA COMPRAS -->
+  <section class="secao ativa" id="secao-compras">
+    <div class="cartao">
+      <div class="cabecalho-secao"><h2>Registrar compra</h2></div>
+      <div class="aviso-edicao" id="avisoEdicaoCompra">
+        <span>Editando compra existente</span>
+        <button class="btn btn-sm btn-secundario" style="color:var(--cacau); border-color:var(--linha);" onclick="cancelarEdicaoCompra()">Cancelar edição</button>
+      </div>
+      <div class="form-grid">
+        <div class="campo">
+          <label>Item</label>
+          <select id="compraItem" onchange="alternarItemPersonalizado()">
+            <option value="">Selecione...</option>
+            <option value="Manteiga">Manteiga</option>
+            <option value="Açúcar mascavo">Açúcar mascavo</option>
+            <option value="Açúcar demerara">Açúcar demerara</option>
+            <option value="Açúcar refinado">Açúcar refinado</option>
+            <option value="Ovos">Ovos</option>
+            <option value="Baunilha">Baunilha</option>
+            <option value="Bicarbonato">Bicarbonato</option>
+            <option value="Sal">Sal</option>
+            <option value="Farinha">Farinha</option>
+            <option value="Gotas de chocolate">Gotas de chocolate</option>
+            <option value="Nutella">Nutella</option>
+            <option value="Kinder">Kinder</option>
+            <option value="Potes">Potes</option>
+            <option value="Potinhos Nutella">Potinhos Nutella</option>
+            <option value="outro">Outro (digitar)</option>
+          </select>
+        </div>
+        <div class="campo" id="campoItemPersonalizado" style="display:none;">
+          <label>Nome do item</label>
+          <input type="text" id="compraItemPersonalizado" placeholder="Digite o item" maxlength="80">
+        </div>
+        <div class="campo">
+          <label>Categoria</label>
+          <select id="compraCategoria">
+            <option value="insumo">Insumo</option>
+            <option value="embalagem">Embalagem</option>
+            <option value="outro">Outro</option>
+          </select>
+        </div>
+        <div class="campo">
+          <label>Quantidade</label>
+          <input type="number" id="compraQtd" step="0.01" min="0" placeholder="0">
+        </div>
+        <div class="campo">
+          <label>Unidade</label>
+          <select id="compraUnidade">
+            <option value="kg">kg</option>
+            <option value="g">g</option>
+            <option value="l">l</option>
+            <option value="ml">ml</option>
+            <option value="unidade">unidade</option>
+            <option value="pacote">pacote</option>
+            <option value="caixinha">caixinha</option>
+            <option value="pote">pote</option>
+          </select>
+        </div>
+        <div class="campo">
+          <label>Custo total (R$)</label>
+          <input type="number" id="compraCusto" step="0.01" min="0" placeholder="0,00">
+        </div>
+        <div class="campo">
+          <button class="btn btn-primario" id="btnSalvarCompra" onclick="salvarCompra()">Adicionar</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="cartao">
+      <div class="cabecalho-secao">
+        <h2>Compras do evento</h2>
+        <span class="tag" id="totalComprasTag">Total: R$ 0,00</span>
+      </div>
+      <div id="listaCompras"><div class="vazio">Nenhuma compra registrada ainda.</div></div>
+    </div>
+  </section>
+
+  <!-- ABA PRODUTOS -->
+  <section class="secao" id="secao-produtos">
+    <div class="cartao">
+      <div class="cabecalho-secao"><h2>Cadastrar produto</h2></div>
+      <div class="aviso-edicao" id="avisoEdicaoProduto">
+        <span>Editando produto existente</span>
+        <button class="btn btn-sm btn-secundario" style="color:var(--cacau); border-color:var(--linha);" onclick="cancelarEdicaoProduto()">Cancelar edição</button>
+      </div>
+      <div class="form-grid">
+        <div class="campo">
+          <label>Nome do produto</label>
+          <input type="text" id="produtoNome" placeholder="Ex: Cookie Nutella" maxlength="80">
+        </div>
+        <div class="campo">
+          <label>Qtd. produzida</label>
+          <input type="number" id="produtoQtd" step="1" min="0" placeholder="0">
+        </div>
+        <div class="campo">
+          <label>Custo unitário (R$)</label>
+          <input type="number" id="produtoCusto" step="0.01" min="0" placeholder="0,00">
+        </div>
+        <div class="campo">
+          <label>Preço de venda (R$)</label>
+          <input type="number" id="produtoPreco" step="0.01" min="0" placeholder="0,00">
+        </div>
+        <div class="campo">
+          <button class="btn btn-primario" id="btnSalvarProduto" onclick="salvarProduto()">Adicionar</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="cartao">
+      <div class="cabecalho-secao"><h2>Produtos do evento</h2></div>
+      <div id="listaProdutos"><div class="vazio">Nenhum produto cadastrado ainda.</div></div>
+    </div>
+  </section>
+
+  <!-- ABA DASHBOARD -->
+  <section class="secao" id="secao-dashboard">
+    <div class="grid-cards" style="margin-bottom:18px;">
+      <div class="stat destaque">
+        <div class="rotulo">Total investido</div>
+        <div class="valor mono" id="statInvestido">R$ 0,00</div>
+      </div>
+      <div class="stat">
+        <div class="rotulo">Unidades produzidas</div>
+        <div class="valor mono" id="statUnidades">0</div>
+      </div>
+      <div class="stat">
+        <div class="rotulo">Custo médio / unidade</div>
+        <div class="valor mono" id="statCustoMedio">R$ 0,00</div>
+      </div>
+      <div class="stat">
+        <div class="rotulo">Receita projetada</div>
+        <div class="valor mono" id="statReceita">R$ 0,00</div>
+      </div>
+      <div class="stat">
+        <div class="rotulo">Lucro projetado</div>
+        <div class="valor mono" id="statLucro">R$ 0,00</div>
+      </div>
+      <div class="stat">
+        <div class="rotulo">Margem média</div>
+        <div class="valor mono" id="statMargem">0%</div>
+      </div>
+    </div>
+
+    <div class="cartao">
+      <div class="cabecalho-secao"><h2>Resumo por produto</h2></div>
+      <div id="resumoProdutos"><div class="vazio">Cadastre produtos para ver o resumo.</div></div>
+    </div>
+
+    <div class="cartao">
+      <div class="cabecalho-secao"><h2>Conferência</h2></div>
+      <p style="font-size:13.5px; color:var(--cacau-2); line-height:1.6;">
+        O <strong>total investido</strong> vem da soma das compras registradas.
+        O <strong>custo médio por unidade</strong> divide esse total pelas unidades produzidas — compare com o
+        custo unitário que você lançou em cada produto para saber se as compras estão batendo com a estimativa.
+      </p>
+    </div>
+  </section>
+
+</main>
+
+<!-- MODAL NOVO EVENTO -->
+<div class="overlay" id="overlayEvento">
+  <div class="modal">
+    <h3>Novo evento</h3>
+    <div class="campo">
+      <label>Nome do evento</label>
+      <input type="text" id="novoEventoNome" placeholder="Ex: Feira de Julho 2026" maxlength="100">
+    </div>
+    <div class="campo">
+      <label>Data do evento</label>
+      <input type="date" id="novoEventoData">
+    </div>
+    <div class="modal-acoes">
+      <button class="btn btn-secundario" style="color:var(--cacau); border-color:var(--linha);" onclick="fecharModalEvento()">Cancelar</button>
+      <button class="btn btn-primario" onclick="criarEvento()">Criar evento</button>
+    </div>
+  </div>
+</div>
+
+<div id="toast"></div>
+
+<!-- Firebase SDKs -->
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
+<script>
+/* ==========================================================================
+   CONFIGURAÇÃO FIREBASE
+   Cole aqui EXATAMENTE o mesmo firebaseConfig usado nas outras páginas
+   do sistema (cardápio / pedidos). É o mesmo projeto — este arquivo só
+   grava dentro do nó "eventosCookies", que é isolado dos dados de
+   brigadeiro (pedidos, cardápio, receitas, etc). Nada aqui lê ou escreve
+   em qualquer outro nó do banco.
+   ========================================================================== */
+const firebaseConfig = {
+  apiKey: "AIzaSyCYqic9IlxUXlS_yEuMLZvmg16wGh5_Ing",
+  authDomain: "doces-flor.firebaseapp.com",
+  databaseURL: "https://doces-flor-default-rtdb.firebaseio.com",
+  projectId: "doces-flor",
+  storageBucket: "doces-flor.firebasestorage.app",
+  messagingSenderId: "430929421910",
+  appId: "1:430929421910:web:2f1bea78c78602c3387df7"
+};
+firebase.initializeApp(firebaseConfig);
+const db = firebase.database();
+
+// Raiz isolada — não encosta em nada do sistema de brigadeiros
+const RAIZ = "eventosCookies";
+
+let eventoAtual = null;
+let cacheEventos = {};
+let cacheCompras = {};
+let cacheProdutos = {};
+
+// Refs de listener ativas — precisam ser desligadas (.off) antes de trocar
+// de evento, senão o listener antigo continua vivo e sobrescreve o cache
+// com dados de outro evento quando algo mudar no banco.
+let refComprasAtiva = null;
+let refProdutosAtiva = null;
+
+// Item/produto em edição (null = modo "adicionar")
+let compraEditandoId = null;
+let produtoEditandoId = null;
+
+/* ---------------- Utilidades ---------------- */
+function formatarMoeda(v){
+  return (v || 0).toLocaleString('pt-BR', { style:'currency', currency:'BRL' });
+}
+function mostrarToast(msg){
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('mostrar');
+  setTimeout(()=> t.classList.remove('mostrar'), 2600);
+}
+function escapeHtml(str){
+  const div = document.createElement('div');
+  div.textContent = str ?? '';
+  return div.innerHTML;
+}
+function mudarAba(nome){
+  document.querySelectorAll('.secao').forEach(s => s.classList.remove('ativa'));
+  document.querySelectorAll('nav.abas button').forEach(b => b.classList.remove('ativo'));
+  document.getElementById('secao-' + nome).classList.add('ativa');
+  document.querySelector(`nav.abas button[data-aba="${nome}"]`).classList.add('ativo');
+  if(nome === 'dashboard') renderizarDashboard();
+}
+
+function alternarItemPersonalizado(){
+  const select = document.getElementById('compraItem');
+  const campo = document.getElementById('campoItemPersonalizado');
+  campo.style.display = select.value === 'outro' ? 'flex' : 'none';
+}
+
+/* ---------------- Eventos ---------------- */
+function abrirModalEvento(){
+  document.getElementById('overlayEvento').classList.add('ativo');
+}
+function fecharModalEvento(){
+  document.getElementById('overlayEvento').classList.remove('ativo');
+  document.getElementById('novoEventoNome').value = '';
+  document.getElementById('novoEventoData').value = '';
+}
+function criarEvento(){
+  const nome = document.getElementById('novoEventoNome').value.trim();
+  const data = document.getElementById('novoEventoData').value;
+  if(!nome){ mostrarToast('Dê um nome para o evento'); return; }
+  const ref = db.ref(`${RAIZ}/eventos`).push();
+  ref.set({
+    nome: nome,
+    data: data || null,
+    criadoEm: Date.now(),
+    status: 'ativo'
+  }).then(()=>{
+    mostrarToast('Evento criado!');
+    fecharModalEvento();
+    selecionarEvento(ref.key);
+  }).catch(err => mostrarToast('Erro ao criar evento: ' + err.message));
+}
+
+function carregarEventos(){
+  db.ref(`${RAIZ}/eventos`).on('value', snap => {
+    cacheEventos = snap.val() || {};
+    const select = document.getElementById('seletorEvento');
+    const anteriorSelecionado = select.value;
+    select.innerHTML = '';
+    const ids = Object.keys(cacheEventos);
+    if(ids.length === 0){
+      select.innerHTML = '<option value="">Nenhum evento — crie um</option>';
+      atualizarBotaoStatus();
+      return;
+    }
+    ids.sort((a,b) => (cacheEventos[b].criadoEm||0) - (cacheEventos[a].criadoEm||0));
+    ids.forEach(id => {
+      const ev = cacheEventos[id];
+      const opt = document.createElement('option');
+      opt.value = id;
+      const rotuloStatus = ev.status === 'encerrado' ? ' — encerrado' : '';
+      opt.textContent = ev.nome + (ev.data ? ` (${formatarData(ev.data)})` : '') + rotuloStatus;
+      select.appendChild(opt);
+    });
+    const alvo = ids.includes(eventoAtual) ? eventoAtual : (ids.includes(anteriorSelecionado) ? anteriorSelecionado : ids[0]);
+    select.value = alvo;
+    selecionarEvento(alvo);
+  });
+}
+function formatarData(iso){
+  if(!iso) return '';
+  const [ano,mes,dia] = iso.split('-');
+  return `${dia}/${mes}/${ano}`;
+}
+
+document.getElementById('seletorEvento').addEventListener('change', e => {
+  selecionarEvento(e.target.value);
+});
+
+function selecionarEvento(id){
+  eventoAtual = id;
+  if(!id){
+    atualizarBotaoStatus();
+    return;
+  }
+  document.getElementById('seletorEvento').value = id;
+  // Cancela qualquer edição pendente ao trocar de evento
+  cancelarEdicaoCompra();
+  cancelarEdicaoProduto();
+  escutarCompras(id);
+  escutarProdutos(id);
+  atualizarBotaoStatus();
+}
+
+function atualizarBotaoStatus(){
+  const btn = document.getElementById('btnStatusEvento');
+  const ev = eventoAtual ? cacheEventos[eventoAtual] : null;
+  if(!ev){
+    btn.textContent = '•';
+    btn.disabled = true;
+    return;
+  }
+  btn.disabled = false;
+  btn.textContent = ev.status === 'encerrado' ? 'Reabrir evento' : 'Encerrar evento';
+}
+function alternarStatusEvento(){
+  if(!eventoAtual) return;
+  const ev = cacheEventos[eventoAtual];
+  const novoStatus = ev && ev.status === 'encerrado' ? 'ativo' : 'encerrado';
+  db.ref(`${RAIZ}/eventos/${eventoAtual}/status`).set(novoStatus)
+    .then(()=> mostrarToast(novoStatus === 'encerrado' ? 'Evento encerrado' : 'Evento reaberto'))
+    .catch(err => mostrarToast('Erro: ' + err.message));
+}
+
+/* ---------------- Compras ---------------- */
+function salvarCompra(){
+  if(!eventoAtual){ mostrarToast('Selecione ou crie um evento primeiro'); return; }
+  let item = document.getElementById('compraItem').value;
+  if(item === 'outro'){
+    item = document.getElementById('compraItemPersonalizado').value.trim();
+  }
+  const categoria = document.getElementById('compraCategoria').value;
+  const qtd = parseFloat(document.getElementById('compraQtd').value);
+  const unidade = document.getElementById('compraUnidade').value;
+  const custo = parseFloat(document.getElementById('compraCusto').value);
+
+  if(!item || isNaN(custo) || custo <= 0){
+    mostrarToast('Preencha item e custo total');
+    return;
+  }
+  if(!isNaN(qtd) && qtd < 0){ mostrarToast('Quantidade não pode ser negativa'); return; }
+
+  const dados = {
+    item, categoria, quantidade: isNaN(qtd) ? 0 : qtd, unidade,
+    custoTotal: custo
+  };
+
+  const promessa = compraEditandoId
+    ? db.ref(`${RAIZ}/compras/${eventoAtual}/${compraEditandoId}`).update(dados)
+    : db.ref(`${RAIZ}/compras/${eventoAtual}`).push({ ...dados, data: Date.now() });
+
+  promessa.then(()=>{
+    mostrarToast(compraEditandoId ? 'Compra atualizada!' : 'Compra registrada!');
+    cancelarEdicaoCompra();
+  }).catch(err => mostrarToast('Erro: ' + err.message));
+}
+
+function editarCompra(id){
+  const c = cacheCompras[id];
+  if(!c) return;
+  compraEditandoId = id;
+  const selectItem = document.getElementById('compraItem');
+  const existeNaLista = Array.from(selectItem.options).some(o => o.value === c.item);
+  if(existeNaLista){
+    selectItem.value = c.item;
+    document.getElementById('campoItemPersonalizado').style.display = 'none';
+  } else {
+    selectItem.value = 'outro';
+    document.getElementById('compraItemPersonalizado').value = c.item;
+    document.getElementById('campoItemPersonalizado').style.display = 'flex';
+  }
+  document.getElementById('compraCategoria').value = c.categoria || 'insumo';
+  document.getElementById('compraQtd').value = c.quantidade || '';
+  document.getElementById('compraUnidade').value = c.unidade || 'kg';
+  document.getElementById('compraCusto').value = c.custoTotal || '';
+  document.getElementById('btnSalvarCompra').textContent = 'Salvar edição';
+  document.getElementById('avisoEdicaoCompra').classList.add('ativo');
+  document.getElementById('compraItem').scrollIntoView({ behavior:'smooth', block:'center' });
+}
+
+function cancelarEdicaoCompra(){
+  compraEditandoId = null;
+  document.getElementById('compraItem').value = '';
+  document.getElementById('compraItemPersonalizado').value = '';
+  document.getElementById('campoItemPersonalizado').style.display = 'none';
+  document.getElementById('compraQtd').value = '';
+  document.getElementById('compraCusto').value = '';
+  document.getElementById('btnSalvarCompra').textContent = 'Adicionar';
+  document.getElementById('avisoEdicaoCompra').classList.remove('ativo');
+}
+
+function escutarCompras(eventoId){
+  if(refComprasAtiva) refComprasAtiva.off();
+  refComprasAtiva = db.ref(`${RAIZ}/compras/${eventoId}`);
+  refComprasAtiva.on('value', snap => {
+    cacheCompras = snap.val() || {};
+    renderizarCompras();
+    if(document.getElementById('secao-dashboard').classList.contains('ativa')) renderizarDashboard();
+  });
+}
+
+function renderizarCompras(){
+  const cont = document.getElementById('listaCompras');
+  const ids = Object.keys(cacheCompras);
+  let total = 0;
+  if(ids.length === 0){
+    cont.innerHTML = '<div class="vazio">Nenhuma compra registrada ainda.</div>';
+    document.getElementById('totalComprasTag').textContent = 'Total: R$ 0,00';
+    return;
+  }
+  ids.sort((a,b) => (cacheCompras[b].data||0) - (cacheCompras[a].data||0));
+  let linhas = '';
+  ids.forEach(id => {
+    const c = cacheCompras[id];
+    total += c.custoTotal || 0;
+    linhas += `<tr>
+      <td>${escapeHtml(c.item)}</td>
+      <td><span class="tag">${escapeHtml(c.categoria)}</span></td>
+      <td class="num">${(c.quantidade||0)} ${escapeHtml(c.unidade)}</td>
+      <td class="num mono">${formatarMoeda(c.custoTotal)}</td>
+      <td class="num"><div class="acoes-linha">
+        <button class="icon-btn editar" onclick="editarCompra('${id}')">Editar</button>
+        <button class="icon-btn" onclick="excluirCompra('${id}')">Excluir</button>
+      </div></td>
+    </tr>`;
+  });
+  cont.innerHTML = `<table>
+    <thead><tr><th>Item</th><th>Categoria</th><th class="num">Qtd</th><th class="num">Custo</th><th></th></tr></thead>
+    <tbody>${linhas}</tbody>
+  </table>`;
+  document.getElementById('totalComprasTag').textContent = 'Total: ' + formatarMoeda(total);
+}
+
+function excluirCompra(id){
+  const c = cacheCompras[id];
+  const nome = c ? c.item : 'este item';
+  if(!confirm(`Excluir a compra de "${nome}"? Essa ação não pode ser desfeita.`)) return;
+  db.ref(`${RAIZ}/compras/${eventoAtual}/${id}`).remove()
+    .then(()=>{
+      mostrarToast('Compra removida');
+      if(compraEditandoId === id) cancelarEdicaoCompra();
+    })
+    .catch(err => mostrarToast('Erro: ' + err.message));
+}
+
+/* ---------------- Produtos ---------------- */
+function salvarProduto(){
+  if(!eventoAtual){ mostrarToast('Selecione ou crie um evento primeiro'); return; }
+  const nome = document.getElementById('produtoNome').value.trim();
+  const qtd = parseFloat(document.getElementById('produtoQtd').value);
+  const custo = parseFloat(document.getElementById('produtoCusto').value);
+  const preco = parseFloat(document.getElementById('produtoPreco').value);
+
+  if(!nome || isNaN(qtd) || qtd <= 0){
+    mostrarToast('Preencha nome e quantidade produzida');
+    return;
+  }
+  if((!isNaN(custo) && custo < 0) || (!isNaN(preco) && preco < 0)){
+    mostrarToast('Valores não podem ser negativos');
+    return;
+  }
+
+  const dados = {
+    nome,
+    quantidadeProduzida: qtd,
+    custoUnitario: isNaN(custo) ? 0 : custo,
+    precoVenda: isNaN(preco) ? 0 : preco
+  };
+
+  const promessa = produtoEditandoId
+    ? db.ref(`${RAIZ}/produtos/${eventoAtual}/${produtoEditandoId}`).update(dados)
+    : db.ref(`${RAIZ}/produtos/${eventoAtual}`).push(dados);
+
+  promessa.then(()=>{
+    mostrarToast(produtoEditandoId ? 'Produto atualizado!' : 'Produto cadastrado!');
+    cancelarEdicaoProduto();
+  }).catch(err => mostrarToast('Erro: ' + err.message));
+}
+
+function editarProduto(id){
+  const p = cacheProdutos[id];
+  if(!p) return;
+  produtoEditandoId = id;
+  document.getElementById('produtoNome').value = p.nome || '';
+  document.getElementById('produtoQtd').value = p.quantidadeProduzida || '';
+  document.getElementById('produtoCusto').value = p.custoUnitario || '';
+  document.getElementById('produtoPreco').value = p.precoVenda || '';
+  document.getElementById('btnSalvarProduto').textContent = 'Salvar edição';
+  document.getElementById('avisoEdicaoProduto').classList.add('ativo');
+  document.getElementById('produtoNome').scrollIntoView({ behavior:'smooth', block:'center' });
+}
+
+function cancelarEdicaoProduto(){
+  produtoEditandoId = null;
+  document.getElementById('produtoNome').value = '';
+  document.getElementById('produtoQtd').value = '';
+  document.getElementById('produtoCusto').value = '';
+  document.getElementById('produtoPreco').value = '';
+  document.getElementById('btnSalvarProduto').textContent = 'Adicionar';
+  document.getElementById('avisoEdicaoProduto').classList.remove('ativo');
+}
+
+function escutarProdutos(eventoId){
+  if(refProdutosAtiva) refProdutosAtiva.off();
+  refProdutosAtiva = db.ref(`${RAIZ}/produtos/${eventoId}`);
+  refProdutosAtiva.on('value', snap => {
+    cacheProdutos = snap.val() || {};
+    renderizarProdutos();
+    if(document.getElementById('secao-dashboard').classList.contains('ativa')) renderizarDashboard();
+  });
+}
+
+function renderizarProdutos(){
+  const cont = document.getElementById('listaProdutos');
+  const ids = Object.keys(cacheProdutos);
+  if(ids.length === 0){
+    cont.innerHTML = '<div class="vazio">Nenhum produto cadastrado ainda.</div>';
+    return;
+  }
+  let linhas = '';
+  ids.forEach(id => {
+    const p = cacheProdutos[id];
+    const custoTotal = (p.custoUnitario||0) * (p.quantidadeProduzida||0);
+    const receitaTotal = (p.precoVenda||0) * (p.quantidadeProduzida||0);
+    const lucro = receitaTotal - custoTotal;
+    const margem = receitaTotal > 0 ? (lucro / receitaTotal * 100) : 0;
+    linhas += `<tr>
+      <td>${escapeHtml(p.nome)}</td>
+      <td class="num">${p.quantidadeProduzida}</td>
+      <td class="num mono">${formatarMoeda(p.custoUnitario)}</td>
+      <td class="num mono">${formatarMoeda(p.precoVenda)}</td>
+      <td class="num mono ${lucro >= 0 ? 'lucro-pos' : 'lucro-neg'}">${formatarMoeda(lucro)}</td>
+      <td class="num">${margem.toFixed(0)}%</td>
+      <td class="num"><div class="acoes-linha">
+        <button class="icon-btn editar" onclick="editarProduto('${id}')">Editar</button>
+        <button class="icon-btn" onclick="excluirProduto('${id}')">Excluir</button>
+      </div></td>
+    </tr>`;
+  });
+  cont.innerHTML = `<table>
+    <thead><tr>
+      <th>Produto</th><th class="num">Qtd</th><th class="num">Custo un.</th>
+      <th class="num">Venda un.</th><th class="num">Lucro total</th><th class="num">Margem</th><th></th>
+    </tr></thead>
+    <tbody>${linhas}</tbody>
+  </table>`;
+}
+
+function excluirProduto(id){
+  const p = cacheProdutos[id];
+  const nome = p ? p.nome : 'este produto';
+  if(!confirm(`Excluir o produto "${nome}"? Essa ação não pode ser desfeita.`)) return;
+  db.ref(`${RAIZ}/produtos/${eventoAtual}/${id}`).remove()
+    .then(()=>{
+      mostrarToast('Produto removido');
+      if(produtoEditandoId === id) cancelarEdicaoProduto();
+    })
+    .catch(err => mostrarToast('Erro: ' + err.message));
+}
+
+/* ---------------- Dashboard ---------------- */
+function renderizarDashboard(){
+  const totalInvestido = Object.values(cacheCompras).reduce((s,c) => s + (c.custoTotal||0), 0);
+  const produtos = Object.values(cacheProdutos);
+  const totalUnidades = produtos.reduce((s,p) => s + (p.quantidadeProduzida||0), 0);
+  const custoMedio = totalUnidades > 0 ? totalInvestido / totalUnidades : 0;
+  const receitaTotal = produtos.reduce((s,p) => s + (p.precoVenda||0) * (p.quantidadeProduzida||0), 0);
+  const custoTotalProdutos = produtos.reduce((s,p) => s + (p.custoUnitario||0) * (p.quantidadeProduzida||0), 0);
+  const lucroTotal = receitaTotal - custoTotalProdutos;
+  const margemMedia = receitaTotal > 0 ? (lucroTotal / receitaTotal * 100) : 0;
+
+  document.getElementById('statInvestido').textContent = formatarMoeda(totalInvestido);
+  document.getElementById('statUnidades').textContent = totalUnidades;
+  document.getElementById('statCustoMedio').textContent = formatarMoeda(custoMedio);
+  document.getElementById('statReceita').textContent = formatarMoeda(receitaTotal);
+  document.getElementById('statLucro').textContent = formatarMoeda(lucroTotal);
+  document.getElementById('statLucro').style.color = lucroTotal >= 0 ? 'var(--verde)' : 'var(--vermelho)';
+  document.getElementById('statMargem').textContent = margemMedia.toFixed(0) + '%';
+
+  const cont = document.getElementById('resumoProdutos');
+  if(produtos.length === 0){
+    cont.innerHTML = '<div class="vazio">Cadastre produtos para ver o resumo.</div>';
+    return;
+  }
+  let linhas = '';
+  Object.entries(cacheProdutos).forEach(([id,p]) => {
+    const custoTotal = (p.custoUnitario||0) * (p.quantidadeProduzida||0);
+    const receita = (p.precoVenda||0) * (p.quantidadeProduzida||0);
+    const lucro = receita - custoTotal;
+    linhas += `<tr>
+      <td>${escapeHtml(p.nome)}</td>
+      <td class="num mono">${formatarMoeda(custoTotal)}</td>
+      <td class="num mono">${formatarMoeda(receita)}</td>
+      <td class="num mono ${lucro >= 0 ? 'lucro-pos' : 'lucro-neg'}">${formatarMoeda(lucro)}</td>
+    </tr>`;
+  });
+  linhas += `<tr class="total-row">
+    <td>Total</td>
+    <td class="num mono">${formatarMoeda(custoTotalProdutos)}</td>
+    <td class="num mono">${formatarMoeda(receitaTotal)}</td>
+    <td class="num mono">${formatarMoeda(lucroTotal)}</td>
+  </tr>`;
+  cont.innerHTML = `<table>
+    <thead><tr><th>Produto</th><th class="num">Custo total</th><th class="num">Receita total</th><th class="num">Lucro</th></tr></thead>
+    <tbody>${linhas}</tbody>
+  </table>`;
+}
+
+/* ---------------- Início ---------------- */
+carregarEventos();
+</script>
+</body>
+</html>
