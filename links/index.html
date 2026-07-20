@@ -23,16 +23,21 @@
    Reset, :root (cores) e fontes-base já vêm de shared/theme.css
 ═══════════════════════════════════════════ */
 
+html, body {
+    height: 100%;
+    overflow: hidden;
+}
 body {
-    min-height: 100vh;
-    min-height: 100dvh;
+    height: 100vh;
+    height: 100dvh;
     display: flex;
     align-items: center;
     justify-content: center;
-    padding: 24px;
+    padding: 16px;
     position: relative;
     background: var(--brown-dark);
     color: var(--text-body);
+    box-sizing: border-box;
 }
 body::before {
     content: '';
@@ -49,24 +54,29 @@ body::before {
     z-index: 1;
     background: var(--cream);
     border-radius: 24px;
-    padding: 28px 28px 22px;
+    padding: 3vh 28px 2.2vh;
     width: 100%;
     max-width: 380px;
+    max-height: 100%;
     box-shadow: 0 30px 80px rgba(0,0,0,0.5);
     text-align: center;
+    overflow-y: auto;
+    box-sizing: border-box;
 }
 
 .logo-ring {
-    width: 190px; height: 190px;
+    width: clamp(80px, 16vh, 130px);
+    height: clamp(80px, 16vh, 130px);
     border-radius: 50%;
     border: 3px solid var(--amber);
-    padding: 6px;
+    padding: 5px;
     background: var(--brown-dark);
     box-shadow: 0 0 0 1px rgba(232,148,58,0.3), 0 12px 30px rgba(0,0,0,0.4);
-    margin: 0 auto 16px;
+    margin: 0 auto 1.5vh;
     animation: logoFlutua 4s ease-in-out infinite;
     position: relative;
 }
+
 .logo-ring::before {
     content: '';
     position: absolute;
@@ -106,32 +116,33 @@ body::before {
     font-family: 'Cormorant Garamond', serif;
     font-style: italic;
     color: var(--brown-warm);
-    font-size: 0.95rem;
-    margin-bottom: 18px;
+    font-size: clamp(0.8rem, 2.2vh, 0.95rem);
+    margin-bottom: 1.8vh;
 }
 
 .links {
     display: flex;
     flex-direction: column;
-    gap: 9px;
+    gap: 1.1vh;
 }
 
 .link-item {
     display: flex;
     align-items: center;
-    gap: 12px;
+    gap: 10px;
     width: 100%;
-    padding: 10px 16px;
+    padding: 1.2vh 16px;
     border-radius: 14px;
     background: var(--white);
     border: 2px solid var(--cream-dark);
     color: var(--brown-dark);
     font-family: 'DM Sans', sans-serif;
     font-weight: 600;
-    font-size: 0.86rem;
+    font-size: clamp(0.78rem, 2vh, 0.86rem);
     text-decoration: none;
     text-align: left;
     transition: border-color 0.2s, transform 0.15s, background 0.2s;
+    box-sizing: border-box;
 }
 .link-item:hover { border-color: var(--amber); background: var(--cream-dark); transform: translateY(-2px); }
 .link-item:active { transform: translateY(0); }
@@ -171,8 +182,8 @@ body::before {
 .link-item.principal:hover { background: #C9522A; border-color: #C9522A; }
 
 .rodape {
-    margin-top: 28px;
-    font-size: 0.74rem;
+    margin-top: 1.8vh;
+    font-size: 0.7rem;
     color: var(--brown-warm);
     opacity: 0.7;
     letter-spacing: 0.04em;
