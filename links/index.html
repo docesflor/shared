@@ -129,6 +129,24 @@ body::before {
     margin-bottom: 1.8vh;
 }
 
+.btn-compartilhar {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    margin: 0 auto 1.8vh;
+    padding: 0.5vh 16px;
+    border-radius: 50px;
+    border: 1.5px solid var(--cream-dark);
+    background: var(--white);
+    color: var(--brown-warm);
+    font-family: 'DM Sans', sans-serif;
+    font-size: 0.78rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: border-color 0.2s, background 0.2s;
+}
+.btn-compartilhar:hover { border-color: var(--amber); background: var(--cream-dark); }
+
 .links {
     display: flex;
     flex-direction: column;
@@ -204,6 +222,9 @@ body::before {
 <div class="box">
     <div class="logo-ring"><img src="https://docesflor.github.io/shared/icone.png" alt="Doces Flor"></div>
     <p class="tagline">Brigadeiros artesanais · Jaraguá do Sul</p>
+    <button class="btn-compartilhar" id="btnCompartilhar" onclick="compartilharPagina()">
+        <span id="iconeCompartilhar">🔗</span> <span id="textoCompartilhar">Compartilhar</span>
+    </button>
 
     <div class="links" id="links">
         <a href="https://docesflor.github.io/cardapio/" class="link-item principal" target="_blank" rel="noopener" data-nome="cardapio">
@@ -233,6 +254,31 @@ body::before {
 // Registra cliques por link (opcional, ajuda a medir qual canal mais converte)
 firebase.initializeApp(window.FIREBASE_CONFIG);
 const database = firebase.database();
+
+async function compartilharPagina() {
+    const url = 'https://docesflor.github.io/links/';
+    const texto = 'Doces Flor — Brigadeiros artesanais 🌸';
+    if (navigator.share) {
+        try {
+            await navigator.share({ title: texto, url });
+        } catch (e) { /* usuário cancelou o compartilhamento, ignora */ }
+        return;
+    }
+    try {
+        await navigator.clipboard.writeText(url);
+        document.getElementById('iconeCompartilhar').textContent = '✓';
+        document.getElementById('textoCompartilhar').textContent = 'Link copiado!';
+        setTimeout(() => {
+            document.getElementById('iconeCompartilhar').textContent = '🔗';
+            document.getElementById('textoCompartilhar').textContent = 'Compartilhar';
+        }, 2000);
+    } catch (e) {
+        window.prompt('Copie o link:', url);
+    }
+}
+
+database.ref('estatisticas-links/_visualizacoes_pagina').transaction(atual => (atual || 0) + 1)
+    .catch(err => console.warn('Erro ao contar visualização:', err));
 
 document.querySelectorAll('.link-item').forEach(el => {
     el.addEventListener('click', function(e) {
