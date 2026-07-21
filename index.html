@@ -63,8 +63,9 @@ body::before {
     max-height: 100%;
     box-shadow: 0 30px 80px rgba(0,0,0,0.5);
     text-align: center;
-    overflow-y: auto;
+    overflow-y: hidden;
     box-sizing: border-box;
+    transform-origin: center center;
 }
 
 .logo-ring {
@@ -307,6 +308,23 @@ database.ref('estatisticas-links').once('value').then(snap => {
         if (el) el.classList.add('mais-clicado');
     }
 });
+
+// Encolhe o box proporcionalmente se o conteúdo não couber na tela (sem scroll)
+function ajustarEscalaBox() {
+    const box = document.querySelector('.box');
+    box.style.transform = 'scale(1)'; // reseta antes de medir
+    const alturaDisponivel = window.innerHeight - 32; // 16px de padding do body em cima e embaixo
+    const alturaConteudo = box.scrollHeight;
+    if (alturaConteudo > alturaDisponivel) {
+        const escala = alturaDisponivel / alturaConteudo;
+        box.style.transform = `scale(${escala})`;
+    }
+}
+window.addEventListener('load', ajustarEscalaBox);
+window.addEventListener('resize', ajustarEscalaBox);
+// Reajusta depois que os links terminam a animação de entrada, caso a altura mude
+setTimeout(ajustarEscalaBox, 700);
+
 </script>
 </body>
 </html>
